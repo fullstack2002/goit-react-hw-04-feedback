@@ -4,49 +4,48 @@ import Statistics from './components/Statistics/Statistics';
 import Notification from './components/Notification/Notification';
 import { Container } from './App.styled';
 
-import React, { Component } from "react";
+import React, { useState } from "react";
 
-class App extends Component {
-	  state = {
+const App = () => {
+	const [state, setState] = useState({
 		good: 0,
 		neutral: 0,
 		bad: 0,
+	});
+
+	const { good, neutral, bad } = state;
+
+	const countTotalFeedback = () => {
+    return good + neutral + bad;
 	};
 
-	countTotalFeedback = () => {
-		const { good, neutral, bad } = this.state;
-		return good + neutral + bad;
-	};
+	const countPositiveFeedbackPercentage = () => {
+    return parseInt((good / countTotalFeedback()) * 100);
+  };
 
-	countPositiveFeedbackPercentage = () => {
-		return parseInt((this.state.good / this.countTotalFeedback()) * 100);
-	};
+	const getClick = event => {
+    const target = event.currentTarget.name;
+    return setState({ ...state, ...{ [target]: state[target] + 1 } });
+  };
 
-	getClick = event => {
-		const target = event.currentTarget.name;
-		this.setState(prev => ({ [target]: prev[target] + 1 }));
-	};
-
-	render() {
-		const { good, neutral, bad } = this.state;
-    const buttonArr = Object.keys(this.state);
+	const buttonArr = Object.keys(state);
 		return (
 			<Container>
 				<Section title="Please leave your feedback">
 					<FeedbackOptions
 						options={buttonArr}
-						onLeaveFeedback={this.getClick}
+						onLeaveFeedback={getClick}
 					/>
 				</Section>
 
 				<Section title="Statistics">
-					{this.countTotalFeedback() ? (
+					{countTotalFeedback() ? (
 						<Statistics
 						good={good}
 						neutral={neutral}
 						bad={bad}
-						total={this.countTotalFeedback()}
-						positivePercentage={this.countPositiveFeedbackPercentage()}
+						total={countTotalFeedback()}
+						positivePercentage={countPositiveFeedbackPercentage()}
 						></Statistics>
 						) : (
 						<Notification message="There is no feedback"></Notification>
@@ -54,7 +53,6 @@ class App extends Component {
 				</Section>
 			</Container>
 		);
-	}
-}
+};
 
 export default App;
